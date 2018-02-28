@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dingzhen.dao.UserDao">
+	
+	<select id="findUser" parameterType="user" resultType="user">
+		select userId,userName,password,r.roleName,userDescription,c.class_name
+		from user u left join role r on u.roleId = r.roleId left join class c on u.classid=c.id where 1 = 1
+		<if test="userName != null and '' != userName">  
+            <![CDATA[  
+              AND userName like '%' #{userName} '%'  
+            ]]>  
+        </if>
+        <if test="roleId!=null and roleId!=-1">  
+            <![CDATA[  
+              AND u.roleId = #{roleId}
+            ]]>  
+        </if>
+		<if test="page != null and rows != null" >           
+              limit #{page}, #{rows} 
+        </if>
+	</select>
+
+
+	<select id="countUser" parameterType="user" resultType="int">
+		select count(*) from user u left join role r on u.roleId = r.roleId where 1 = 1
+		<if test="userName != null and '' != userName">  
+            <![CDATA[  
+              AND userName like '%' #{userName} '%'  
+            ]]>  
+        </if>
+         <if test="roleId!=null and roleId!=-1">  
+            <![CDATA[  
+              AND u.roleId = #{roleId}   
+            ]]>  
+        </if>
+        <if test="classid!=null">  
+            <![CDATA[  
+              AND u.classid = #{classid}   
+            ]]>  
+        </if>
+	</select>
+	
+	<select id="findOneUser" parameterType="Integer" resultType="user">
+		select userId,userName,password,classid,roleId,userDescription from user
+		<where>userId=#{userId}</where>
+	</select>
+	
+	<insert id="addUser" parameterType="user" >
+		insert user(userName,password,classid,roleId,userDescription) 
+		values (#{userName},#{password},#{classid},#{roleId},#{userDescription})
+	</insert>
+	
+	<update id="updateUser" parameterType="user">
+    	update user set
+    	<trim suffixOverrides=",">
+			<if test="userName!=null">userName=#{userName},</if>
+			<if test="password!=null">password=#{password},</if>
+			<if test="roleId!=null">roleId=#{roleId},</if>
+			<if test="userDescription!=null">userDescription=#{userDescription},</if>
+		</trim>
+		<where>userId=#{userId}</where>
+    </update>
+	
+	
+	<delete id="deleteUser" parameterType="Integer">
+		delete from user 
+		<where>userId=#{userId}</where>
+	</delete>
+	
+	<select id="loginUser" parameterType="Map" resultType="user">
+		select userId,userName,password,classid,roleId,userDescription from user
+		where userName=#{userName} and password=#{password}
+	</select>
+	
+	
+	<select id="existUserWithUserName" parameterType="String" resultType="user">
+		select userId,userName,password,classid,roleId,userDescription from user
+		where userName=#{userName}
+	</select>
+	
+	
+	<select id="existUserWithRoleId" parameterType="Integer" resultType="user">
+		select userId,userName,password,classid,roleId,userDescription from user
+		where roleId=#{roleId}
+	</select>
+	
+	
+	
+</mapper>

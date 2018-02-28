@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dingzhen.dao.QuestionDao">
+	
+	<select id="showquestion" parameterType="question" resultType="question">
+		select qs.id,qs.question,qs.one,qs.two,qs.three,qs.four from rbps.question_relation qr
+		left join rbps.question_space qs on qr.spacecode=qs.id where 1=1
+		<if test="createId!=null">  
+            <![CDATA[  
+              AND createId = #{createId}
+            ]]>
+        </if>
+		<if test="page != null and rows != null" >           
+              limit #{page}, #{rows} 
+        </if>
+	</select>
+	
+	<select id="findQuestion" parameterType="question" resultType="question">
+		select qc.id, u.userName,questionname from rbps.question_create qc left join rbps.user u on qc.adminId=u.userId
+		<if test="page != null and rows != null" >           
+              limit #{page}, #{rows} 
+        </if>
+	</select>
+	
+	<select id="findQuestionanswer" parameterType="question" resultType="question">
+		select qa.id,u.userName,qc.questionname,questionanswer from rbps.question_answer qa
+		left join rbps.user u on qa.userId=u.userId left join rbps.question_create qc on qa.testId=qc.id where 1=1
+		<if test="createId!=null">  
+            <![CDATA[  
+              AND createId = #{createId}
+            ]]>
+        </if>
+		<if test="page != null and rows != null" >           
+              limit #{page}, #{rows} 
+        </if>
+	</select>
+	
+	<select id="findQuestionspace" parameterType="question" resultType="question">
+		select id,question,one,two,three,four from rbps.question_space
+		<if test="page != null and rows != null" >           
+              limit #{page}, #{rows} 
+        </if>
+	</select>
+
+	<select id="countQuestion" parameterType="question" resultType="int">
+		select count(*) from user u left join role r on u.roleId = r.roleId where 1 = 1
+	</select>
+	
+	<select id="selectid" parameterType="question" resultType="Integer">
+		select id from rbps.question_create where questionname=#{questionname} and adminId=#{adminId}
+	</select>
+	
+	<select id="findOneUser" parameterType="Integer" resultType="user">
+		select userId,userName,password,classid,roleId,userDescription from user
+		<where>userId=#{userId}</where>
+	</select>
+	
+	<insert id="addQuestion" parameterType="question" >
+		insert rbps.question_answer(userId,testId,questionanswer) 
+		values (#{userId},#{testId},#{questionanswer})
+	</insert>
+	
+	<insert id="insertcreatequestion" parameterType="question" >
+		insert rbps.question_relation(createId,spacecode) 
+		values (#{createId},#{spacecode})
+	</insert>
+	
+	<insert id="addQuestionspace" parameterType="question" >
+		insert into rbps.question_space(question,one,two,three,four) 
+		values (#{question},#{one},#{two},#{three},#{four})
+	</insert>
+	
+	<insert id="createquestion" parameterType="question" >
+		insert into rbps.question_create(questionname,adminId) 
+		values (#{questionname},#{adminId})
+	</insert>
+	
+	<insert id="createtest" parameterType="question" >
+		insert into rbps.question_relation(createId,spacecode) 
+		values (#{createId},#{spacecode})
+	</insert>
+	
+	<update id="updateQuestionspace" parameterType="question">
+    	update rbps.question_space set
+    	<trim suffixOverrides=",">
+			<if test="question!=null">question=#{question},</if>
+			<if test="one!=null">one=#{one},</if>
+			<if test="two!=null">two=#{two},</if>
+			<if test="three!=null">three=#{three},</if>
+			<if test="four!=null">four=#{four},</if>
+		</trim>
+		<where>id=#{id}</where>
+    </update>
+	
+	<insert id="createQuestion" parameterType="question" >
+		insert into rbps.question_create (questiontype,adminId) values(#{questiontype},#{adminId})
+	</insert>
+	
+	<update id="updateUser" parameterType="user">
+    	update user set
+    	<trim suffixOverrides=",">
+			<if test="userName!=null">userName=#{userName},</if>
+			<if test="password!=null">password=#{password},</if>
+			<if test="userType!=null">classid=#{classid},</if>
+			<if test="roleId!=null">roleId=#{roleId},</if>
+			<if test="userDescription!=null">userDescription=#{userDescription},</if>
+		</trim>
+		<where>userId=#{userId}</where>
+    </update>
+	
+	
+	<delete id="deleteUser" parameterType="Integer">
+		delete from rbps.question_space 
+		<where>id=#{id}</where>
+	</delete>
+	
+	<delete id="deleteQuestionspace" parameterType="Integer">
+		delete from rbps.question_space 
+		<where>id=#{id}</where>
+	</delete>
+	
+	<select id="loginUser" parameterType="Map" resultType="user">
+		select userId,userName,password,classid,roleId,userDescription from user
+		where userName=#{userName} and password=#{password}
+	</select>
+	
+	
+	<select id="existUserWithUserName" parameterType="question" resultType="int">
+		select count(*) from rbps.question_answer where userId=#{userId} and testId=#{testId}
+	</select>
+	
+	
+	<select id="existUserWithRoleId" parameterType="Integer" resultType="user">
+		select userId,userName,password,classid,roleId,userDescription from user
+		where roleId=#{roleId}
+	</select>
+	
+	
+	
+</mapper>

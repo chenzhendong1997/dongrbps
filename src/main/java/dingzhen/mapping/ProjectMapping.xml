@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dingzhen.dao.ProjectDao">
+	
+	<select id="findProject" parameterType="project" resultType="project">
+		select w.id,u.userName,a.question,a.questionstandard,selfscore,teacherscore,
+		(select d.levelname FROM dict d where d.levelnumber = w.selflevel)selflevel,
+		(select d.levelname FROM dict d where d.levelnumber = w.teacherlevel)teacherlevel
+		from project w left join user u on w.studentId = u.userId left join assignwork a on w.assignId=a.id where 1 = 1
+		<if test="userName != null and '' != userName">  
+            <![CDATA[  
+              AND userName like '%' #{userName} '%'  
+            ]]>  
+        </if>
+        <if test="studentId!=null and studentId!=''">
+            <![CDATA[  
+              AND studentId = #{studentId}
+            ]]>  
+        </if>
+		<if test="page != null and rows != null" >           
+              limit #{page}, #{rows} 
+        </if>
+	</select>
+
+
+	<select id="countProject" parameterType="project" resultType="int">
+		select count(*) from project p  where 1 = 1
+		<if test="userName != null and '' != userName">  
+            <![CDATA[  
+              AND userName like '%' #{userName} '%'  
+            ]]>  
+        </if>
+	</select>
+	
+	<select id="existlevel" parameterType="project" resultType="int">
+		select count(*) from project where 1 = 1
+		<if test="studentId!=null and studentId!=''">
+            <![CDATA[  
+              AND studentId = #{studentId}
+            ]]>  
+        </if>
+        <if test="assignId!=null and assignId!=''">
+            <![CDATA[  
+              AND assignId = #{assignId}
+            ]]>  
+        </if>
+	</select>
+	
+	<select id="findOneUser" parameterType="Integer" resultType="user">
+		select userId,userName,password,classid,roleId,userDescription from user
+		<where>userId=#{userId}</where>
+	</select>
+	
+	<insert id="addUser" parameterType="user" >
+		insert user(userName,password,classid,roleId,userDescription) 
+		values (#{userName},#{password},#{classid},#{roleId},#{userDescription})
+	</insert>
+	
+	<update id="updateProject" parameterType="project">
+    	update project set
+    	<trim suffixOverrides=",">
+			<if test="teacherscore!=null">teacherscore=#{teacherscore},</if>
+			<if test="teacherlevel!=null">teacherlevel=#{teacherlevel},</if>
+		</trim>
+		<where>id=#{id}</where>
+    </update>
+	<insert id="insertProjectlevel" parameterType="project" >
+		insert project(studentId,assignId,selfscore,selflevel) 
+		values (#{studentId},#{assignId},#{selfscore},#{selflevel})
+	</insert>
+	
+	<delete id="deleteUser" parameterType="Integer">
+		delete from user 
+		<where>userId=#{userId}</where>
+	</delete>
+	
+	<select id="loginUser" parameterType="Map" resultType="user">
+		select userId,userName,password,classid,roleId,userDescription from user
+		where userName=#{userName} and password=#{password}
+	</select>
+	<update id="updateProjectlevel" parameterType="project">
+    	update project set
+    	<trim suffixOverrides=",">
+			<if test="teacherscore!=null">teacherscore=#{teacherscore},</if>
+			<if test="teacherlevel!=null">teacherlevel=#{teacherlevel},</if>
+			<if test="selflevel!=null">selflevel=#{selflevel},</if>
+			<if test="selfscore!=null">selfscore=#{selfscore},</if>
+		</trim>
+		where 1=1
+			<if test="id!=null">  
+	            <![CDATA[  
+	              AND id = #{id}
+	            ]]>
+	        </if>
+	        <if test="studentId!=null">
+            	<![CDATA[  
+              	AND studentId = #{studentId}
+            	]]>
+        	</if>
+	        <if test="assignId!=null">  
+	            <![CDATA[  
+	              AND assignId = #{assignId}
+	            ]]>
+	        </if>
+    </update>
+	
+	<select id="existUserWithUserName" parameterType="String" resultType="user">
+		select userId,userName,password,classid,roleId,userDescription from user
+		where userName=#{userName}
+	</select>
+	
+	
+	<select id="existUserWithRoleId" parameterType="Integer" resultType="user">
+		select userId,userName,password,classid,roleId,userDescription from user
+		where roleId=#{roleId}
+	</select>
+	
+	
+	
+</mapper>

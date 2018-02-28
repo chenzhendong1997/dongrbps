@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dingzhen.dao.WokeDao">
+	
+	<select id="findWoke" parameterType="woke" resultType="woke">
+		select w.id,u.userName,a.question,a.questionstandard,selfscore,teacherscore,
+		(select d.levelname FROM dict d where d.levelnumber = w.selflevel)selflevel,
+		(select d.levelname FROM dict d where d.levelnumber = w.teacherlevel)teacherlevel
+		from woke w left join user u on w.studentId = u.userId left join assignwork a on w.assignId=a.id where 1 = 1
+		<if test="userName != null and '' != userName">
+            <![CDATA[  
+              AND u.userName like '%' #{userName} '%'  
+            ]]>  
+        </if>
+        <if test="studentId!=null and studentId!=''">
+            <![CDATA[  
+              AND studentId = #{studentId}
+            ]]>  
+        </if>
+		<if test="page != null and rows != null" >           
+              limit #{page}, #{rows} 
+        </if>
+	</select>
+	
+	<select id="findallhomework" parameterType="woke" resultType="woke">
+		select id,question,questionstandard,type
+		from assignwork where 1 = 1
+		<if test="teacherId!=null and teacherId!=''">
+            <![CDATA[  
+              AND teacherId = #{teacherId}
+            ]]>  
+        </if>
+		<if test="page != null and rows != null" >           
+              limit #{page}, #{rows} 
+        </if>
+	</select>
+
+
+	<select id="countWoke" parameterType="woke" resultType="int">
+		select count(*) from woke w left join user u on w.studentId=u.userId where 1 = 1
+		<if test="userName != null and '' != userName">  
+            <![CDATA[  
+              AND u.userName like '%' #{userName} '%'  
+            ]]>  
+        </if>
+	</select>
+	
+	<select id="existlevel" parameterType="woke" resultType="int">
+		select count(*) from woke where 1 = 1
+		<if test="studentId!=null and studentId!=''">
+            <![CDATA[  
+              AND studentId = #{studentId}
+            ]]>  
+        </if>
+        <if test="assignId!=null and assignId!=''">
+            <![CDATA[  
+              AND assignId = #{assignId}
+            ]]>  
+        </if>
+	</select>
+	
+	<select id="countallhomework" parameterType="woke" resultType="int">
+		select count(*) from assignwork where 1 = 1
+		<if test="teacherId!=null and teacherId!=''">
+            <![CDATA[  
+              AND teacherId = #{teacherId}
+            ]]>  
+        </if>
+	</select>
+	
+	<select id="findOneUser" parameterType="Integer" resultType="user">
+		select userId,userName,password,classid,roleId,userDescription from user
+		<where>userId=#{userId}</where>
+	</select>
+	
+	<insert id="addWoke" parameterType="woke" >
+		insert assignwork(teacherId,question,questionstandard,type) 
+		values (#{teacherId},#{question},#{questionstandard},#{type})
+	</insert>
+	
+	<insert id="insertWokelevel" parameterType="woke" >
+		insert woke(studentId,assignId,selfscore,selflevel) 
+		values (#{studentId},#{assignId},#{selfscore},#{selflevel})
+	</insert>
+	
+	<update id="updateWoke" parameterType="woke">
+    	update assignwork set
+    	<trim suffixOverrides=",">
+			<if test="question!=null">question=#{question},</if>
+			<if test="type!=null">type=#{type},</if>
+			<if test="questionstandard!=null">questionstandard=#{questionstandard},</if>
+		</trim>
+		<where>id=#{id}</where>
+    </update>
+    
+    <update id="updateWokelevel" parameterType="woke">
+    	update woke set
+    	<trim suffixOverrides=",">
+			<if test="teacherscore!=null">teacherscore=#{teacherscore},</if>
+			<if test="teacherlevel!=null">teacherlevel=#{teacherlevel},</if>
+			<if test="selflevel!=null">selflevel=#{selflevel},</if>
+			<if test="selfscore!=null">selfscore=#{selfscore},</if>
+		</trim>
+		where 1=1
+			<if test="id!=null">  
+	            <![CDATA[  
+	              AND id = #{id}
+	            ]]>
+	        </if>
+	        <if test="studentId!=null">
+            	<![CDATA[  
+              	AND studentId = #{studentId}
+            	]]>
+        	</if>
+	        <if test="assignId!=null">  
+	            <![CDATA[  
+	              AND assignId = #{assignId}
+	            ]]>
+	        </if>
+    </update>
+	
+	
+	<delete id="deleteUser" parameterType="Integer">
+		delete from user 
+		<where>userId=#{userId}</where>
+	</delete>
+	
+	<select id="loginUser" parameterType="Map" resultType="user">
+		select userId,userName,password,classid,roleId,userDescription from user
+		where userName=#{userName} and password=#{password}
+	</select>
+	
+	
+	<select id="existUserWithUserName" parameterType="String" resultType="user">
+		select userId,userName,password,classid,roleId,userDescription from user
+		where userName=#{userName}
+	</select>
+	
+	
+	<select id="existUserWithRoleId" parameterType="Integer" resultType="user">
+		select userId,userName,password,classid,roleId,userDescription from user
+		where roleId=#{roleId}
+	</select>
+	
+	
+	
+</mapper>

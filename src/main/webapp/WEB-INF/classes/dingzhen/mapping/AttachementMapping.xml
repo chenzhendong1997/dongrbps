@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dingzhen.dao.AttachmentDao">
+	<insert id="insertAttachment" parameterType="attachment">
+		insert into attachment(attachmentName,attachmentPath,attachmentTime) 
+		values (#{attachmentName},#{attachmentPath},#{attachmentTime});
+	</insert>
+	
+	
+	<select id="findAttachment" parameterType="attachment" resultType="attachment">
+		select attachmentId,attachmentName,attachmentPath,attachmentTime from attachment
+		order by attachmentId desc
+		<if test="page != null and rows != null" >           
+              limit #{page}, #{rows} 
+        </if> 
+	</select>
+	
+	<select id="countAttachment" parameterType="attachment" resultType="int">
+		select count(*) from attachment
+	</select>
+	
+</mapper>
